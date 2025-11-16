@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   const handleDownloadResume = () => {
-    // In production, this would link to the actual resume PDF
-    window.open("#", "_blank");
+    const link = document.createElement('a');
+    link.href = '/Brian_Ekitela_Resume.pdf';
+    link.download = 'Brian_Ekitela_Resume.pdf';
+    link.click();
   };
 
   return (
