@@ -20,7 +20,7 @@ const Hero = () => {
         backgroundAttachment: "fixed",
       }}
     >
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
       
       <div className="relative z-10 text-center px-4 animate-fade-in-up">
         <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-4" style={{ fontFamily: 'Georgia, serif' }}>
