@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Moon, Sun } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Navbar = () => {
   const [activeSection, setActiveSection] = useState("home");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,10 +40,30 @@ const Navbar = () => {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
+    setMobileMenuOpen(false);
+  };
+
+  const handleBlogClick = () => {
+    if (location.pathname === "/blog") {
+      navigate("/");
+    } else {
+      navigate("/blog");
+    }
+    setMobileMenuOpen(false);
   };
 
   const navItems = [
@@ -57,35 +85,35 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
               item.id === "projects" ? (
-                <Link
+                <button
                   key={item.id}
-                  to="/blog"
+                  onClick={handleBlogClick}
                   className={`text-foreground hover:text-primary transition-colors ${
-                    window.location.pathname === "/blog" ? "text-primary font-semibold" : ""
+                    location.pathname === "/blog" ? "text-primary font-semibold" : ""
                   }`}
                 >
                   {item.label}
-                </Link>
+                </button>
               ) : (
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
                   className={`text-foreground hover:text-primary transition-colors ${
-                    activeSection === item.id ? "text-primary font-semibold" : ""
+                    activeSection === item.id && location.pathname === "/" ? "text-primary font-semibold" : ""
                   }`}
                 >
                   {item.label}
                 </button>
               )
             ))}
-            <Link
-              to="/blog"
+            <button
+              onClick={handleBlogClick}
               className={`text-foreground hover:text-primary transition-colors ${
-                window.location.pathname === "/blog" ? "text-primary font-semibold" : ""
+                location.pathname === "/blog" ? "text-primary font-semibold" : ""
               }`}
             >
               Blog
-            </Link>
+            </button>
             
             <Button
               variant="ghost"
@@ -99,20 +127,62 @@ const Navbar = () => {
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <button className="md:hidden text-foreground">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          {/* Mobile menu */}
+          <div className="md:hidden flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
-              <path d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          </button>
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col gap-6 mt-8">
+                  {navItems.map((item) => (
+                    item.id === "projects" ? (
+                      <button
+                        key={item.id}
+                        onClick={handleBlogClick}
+                        className={`text-lg text-left text-foreground hover:text-primary transition-colors ${
+                          location.pathname === "/blog" ? "text-primary font-semibold" : ""
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <button
+                        key={item.id}
+                        onClick={() => scrollToSection(item.id)}
+                        className={`text-lg text-left text-foreground hover:text-primary transition-colors ${
+                          activeSection === item.id && location.pathname === "/" ? "text-primary font-semibold" : ""
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    )
+                  ))}
+                  <button
+                    onClick={handleBlogClick}
+                    className={`text-lg text-left text-foreground hover:text-primary transition-colors ${
+                      location.pathname === "/blog" ? "text-primary font-semibold" : ""
+                    }`}
+                  >
+                    Blog
+                  </button>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </nav>
